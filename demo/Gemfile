@@ -1,3 +1,5 @@
 gem 'apparition', path: '/Users/tyler/code/apparition'
 gem 'rack'
 gem 'debugger'
+gem 'rspec'
+gem 'rake'
