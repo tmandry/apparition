@@ -5,15 +5,22 @@ require 'debugger'
 module Apparition
   class << self
     attr_accessor :app
-    attr_reader :server
 
     def start
-      @server = Server.new(Apparition.app).boot
-      puts "Listening at http://localhost:#{@server.port}/"
+      server.boot
+      puts "Listening at http://localhost:#{server.port}/"
     end
 
     def join(*args)
-      @server.join(*args)
+      server.join(*args)
+    end
+
+    def wrapped_app
+      server.middleware
+    end
+
+    def server
+      @server ||= Server.new(Apparition.app)
     end
   end
 end

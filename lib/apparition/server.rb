@@ -13,7 +13,7 @@ module Apparition
       end
     end
 
-    attr_reader :port
+    attr_reader :port, :middleware
 
     def initialize(app, port = 1337)
       @app = app
@@ -28,6 +28,10 @@ module Apparition
         Rack::Handler::WEBrick.run(@middleware, :Port => @port, :AccessLog => [], :Logger => WEBrick::Log::new(nil, 0))
       end
       self
+    end
+
+    def shutdown
+      Rack::Handler::WEBrick.shutdown
     end
 
     def join(*args)
