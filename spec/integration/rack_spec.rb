@@ -8,7 +8,10 @@ describe "Apparition server" do
     Apparition.app = Rack::Builder.new do
       run Rack::Lobster.new
     end.to_app
-    @session = Capybara::Session.new(:rack_test, Apparition.wrapped_app)
+    @session = Capybara::Session.new(:rack_test, Apparition.current_session.wrapped_app)
+  end
+  after(:each) do
+    Apparition.current_session.reset!
   end
 
   it "acts as middleware" do

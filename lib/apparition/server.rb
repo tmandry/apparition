@@ -9,7 +9,11 @@ module Apparition
 
       def call(env)
         puts "Middleware#call here"
-        @app.call(env)
+        if (env["PATH_INFO"] == "/__shutdown__")
+          Rack::Handler::WEBrick.shutdown
+        else
+          @app.call(env)
+        end
       end
     end
 
@@ -28,10 +32,6 @@ module Apparition
         Rack::Handler::WEBrick.run(@middleware, :Port => @port, :AccessLog => [], :Logger => WEBrick::Log::new(nil, 0))
       end
       self
-    end
-
-    def shutdown
-      Rack::Handler::WEBrick.shutdown
     end
 
     def join(*args)

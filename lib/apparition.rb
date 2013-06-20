@@ -1,26 +1,15 @@
 require 'apparition/version'
 require 'apparition/server'
+require 'apparition/session'
 require 'debugger'
 
 module Apparition
   class << self
     attr_accessor :app
+    attr_reader :current_session
 
-    def start
-      server.boot
-      puts "Listening at http://localhost:#{server.port}/"
-    end
-
-    def join(*args)
-      server.join(*args)
-    end
-
-    def wrapped_app
-      server.middleware
-    end
-
-    def server
-      @server ||= Server.new(Apparition.app)
+    def current_session
+      @session ||= Apparition::Session.new(app)
     end
   end
 end
