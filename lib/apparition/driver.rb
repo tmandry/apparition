@@ -2,21 +2,24 @@ require 'selenium-webdriver'
 
 module Apparition
   class Driver
-    attr_reader :browser
-
     def browser
       unless @browser
         @browser = Selenium::WebDriver.for(options[:browser])
       end
+      @browser
     end
 
     def visit(path)
       browser.navigate.to(path)
     end
 
+    def save_screenshot(path)
+      browser.save_screenshot(path)
+    end
+
     def options
       {
-        browser: :phantomjs
+        browser: :chrome
       }
     end
   end

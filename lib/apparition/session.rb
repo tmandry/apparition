@@ -28,6 +28,10 @@ module Apparition
       driver.visit(url)
     end
 
+    def save_screenshot(path)
+      driver.save_screenshot(path)
+    end
+
     private
 
     def server
