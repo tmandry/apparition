@@ -1,4 +1,5 @@
-require "rack"
+require 'rack'
+require 'net/http'
 
 module Apparition
   class Server
@@ -8,8 +9,12 @@ module Apparition
       end
 
       def call(env)
-        if (env["PATH_INFO"] == "/__shutdown__")
+        case env["PATH_INFO"]
+        when "/__shutdown__"
           Rack::Handler::WEBrick.shutdown
+          [200, {}, []]
+        when "/__ping__"
+          [200, {}, [object_id.to_s]]
         else
           @app.call(env)
         end
@@ -18,9 +23,9 @@ module Apparition
 
     attr_reader :port, :middleware
 
-    def initialize(app, port = 1337)
+    def initialize(app, port = nil)
       @app = app
-      @port = port
+      @port = port || find_available_port
       @middleware = Middleware.new(app)
       @server_thread = nil
     end
@@ -29,12 +34,40 @@ module Apparition
       @server_thread ||= Thread.new do
         require 'rack/handler/webrick'
         Rack::Handler::WEBrick.run(@middleware, :Port => @port, :AccessLog => [], :Logger => WEBrick::Log::new(nil, 0))
+        # Rack::Handler::WEBrick.run(@middleware, :Port => @port)
+      end
+
+      Timeout.timeout(30) do
+        until running? do
+          @server_thread.join(0.1)
+        end
       end
       self
+    rescue Timeout::Error
+      raise "Rack app timed out while trying to start server"
     end
 
-    def join(*args)
-      @server_thread.join(*args)
+    private
+
+    def running?
+      return false if @server_thread && @server_thread.join(0)
+
+      begin
+        res = Net::HTTP.start('localhost', @port) { |http| http.get('/__ping__') }
+      rescue SystemCallError
+        return false
+      end
+
+      if res.is_a?(Net::HTTPSuccess) or res.is_a?(Net::HTTPRedirection)
+        return res.body == @middleware.object_id.to_s
+      end
+    end
+
+    def find_available_port
+      server = TCPServer.new('127.0.0.1', 0)
+      server.addr[1]
+    ensure
+      server.close if server
     end
   end
 end

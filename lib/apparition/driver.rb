@@ -16,7 +16,7 @@ module Apparition
 
     def options
       {
-        browser: :chrome
+        browser: :phantomjs
       }
     end
   end
