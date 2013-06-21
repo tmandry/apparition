@@ -1,7 +1,7 @@
 module Apparition
   module DSL
-    def visit(url)
-      Apparition.current_session.driver.visit(url)
+    def visit(path)
+      Apparition.current_session.visit(path)
     end
   end
 end

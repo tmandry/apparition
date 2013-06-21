@@ -8,7 +8,6 @@ module Apparition
       end
 
       def call(env)
-        puts "Middleware#call here"
         if (env["PATH_INFO"] == "/__shutdown__")
           Rack::Handler::WEBrick.shutdown
         else

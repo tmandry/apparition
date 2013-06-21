@@ -1,7 +1,23 @@
+require 'selenium-webdriver'
+
 module Apparition
   class Driver
-    def visit(url)
-      puts url
+    attr_reader :browser
+
+    def browser
+      unless @browser
+        @browser = Selenium::WebDriver.for(options[:browser])
+      end
+    end
+
+    def visit(path)
+      browser.navigate.to(path)
+    end
+
+    def options
+      {
+        browser: :chrome
+      }
     end
   end
 end

@@ -11,5 +11,9 @@ module Apparition
     def current_session
       @session ||= Apparition::Session.new(app)
     end
+
+    def reset!
+      @session = nil
+    end
   end
 end
